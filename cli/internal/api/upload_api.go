@@ -139,11 +139,13 @@ func (c *Client) CreateFile(ctx context.Context, req FileCreateRequest) (*File, 
 
 // CreateCollection creates a new collection (album)
 func (c *Client) CreateCollection(ctx context.Context, req CreateCollectionRequest) (*Collection, error) {
-	var result Collection
+	var res struct {
+		Collection Collection `json:"collection"`
+	}
 	r, err := c.restClient.R().
 		SetContext(ctx).
 		SetBody(req).
-		SetResult(&result).
+		SetResult(&res).
 		Post("/collections")
 
 	if err != nil {
@@ -157,7 +159,7 @@ func (c *Client) CreateCollection(ctx context.Context, req CreateCollectionReque
 		}
 	}
 
-	return &result, nil
+	return &res.Collection, nil
 }
 
 // CreateCollectionRequest represents the collection creation payload

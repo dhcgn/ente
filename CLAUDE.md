@@ -391,3 +391,7 @@ When implementing CLI upload functionality:
 - Cryptography audit: https://ente.io/blog/cryptography-audit/
 - Architecture: https://ente.io/architecture
 - Reliability: https://ente.io/reliability
+
+## REMEBER THESE BUGS!
+
+- If user want to upload a files that is already uploaded than don't upload it, but add this the album!

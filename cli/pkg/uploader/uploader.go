@@ -177,6 +177,7 @@ func (u *Uploader) uploadFile(filePath string, collectionID int64, collectionKey
 	}
 
 	// Step 6: Encrypt everything
+	fmt.Printf("\n=== Starting encryption for: %s ===\n", filepath.Base(filePath))
 	encryptedData, err := u.encryptFileData(filePath, thumbnailData, metadata, collectionKey)
 	if err != nil {
 		result.Error = fmt.Errorf("failed to encrypt data: %w", err)
@@ -184,6 +185,15 @@ func (u *Uploader) uploadFile(filePath string, collectionID int64, collectionKey
 		return result
 	}
 	defer os.RemoveAll(encryptedData.TempDir)
+
+	// Debug: Show encrypted data summary
+	fmt.Printf("\nDebug [Upload] - Encrypted data summary:\n")
+	fmt.Printf("  File decryption header: %s (len=%d)\n",
+		encryptedData.FileDecryptionHeader, len(encryptedData.FileDecryptionHeader))
+	fmt.Printf("  Encrypted file size: %d bytes\n", encryptedData.EncryptedFileSize)
+	fmt.Printf("  Thumbnail decryption header: %s (len=%d)\n",
+		encryptedData.ThumbnailDecryptionHeader, len(encryptedData.ThumbnailDecryptionHeader))
+	fmt.Printf("  Encrypted thumbnail size: %d bytes\n", encryptedData.EncryptedThumbnailSize)
 
 	// Step 7: Upload to S3
 	if err := u.uploadToS3(encryptedData); err != nil {

@@ -10,6 +10,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"path/filepath"
 )
 
 const (
@@ -78,6 +79,8 @@ func UploadToS3(url string, filePath string, md5Hash string) error {
 		return fmt.Errorf("failed to stat file: %w", err)
 	}
 
+	fmt.Printf("Debug - Uploading to S3: file=%s, size=%d bytes\n", filepath.Base(filePath), fileInfo.Size())
+
 	req, err := http.NewRequest(http.MethodPut, url, file)
 	if err != nil {
 		return fmt.Errorf("failed to create request: %w", err)
@@ -93,6 +96,8 @@ func UploadToS3(url string, filePath string, md5Hash string) error {
 		return fmt.Errorf("failed to upload to S3: %w", err)
 	}
 	defer resp.Body.Close()
+
+	fmt.Printf("Debug - S3 upload response: status=%d\n", resp.StatusCode)
 
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
