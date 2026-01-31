@@ -16,3 +16,8 @@ rust/cli/exports/
 
 # Node
 node_modules/
+
+*.exe
+
+.claude/settings.local.json
+*.har
