@@ -1,114 +1,304 @@
-<div align="center">
+# Ente CLI
 
-<img src=".github/assets/ente-rocketship.png" width="400"/>
+Standalone command-line tool for Ente Photos with upload and folder watching capabilities.
 
-Fully open source end-to-end encrypted photos, authenticators and more.
+## About This Fork
 
-</div>
+This is a fork of the official [ente-io/ente](https://github.com/ente-io/ente) repository, cleaned up to contain only the CLI tool with extended functionality.
 
-# Ente
+### Original Purpose
 
-Ente is a service that provides a fully open source, end-to-end encrypted
-platform for you to store your data in the cloud without needing to trust the
-service provider. On top of this platform, we have built two apps so far: Ente
-Photos (an alternative to Apple and Google Photos) and Ente Auth (a 2FA
-alternative to the deprecated Authy).
+The Ente CLI was originally developed by the Ente team for:
+- Exporting photos/videos to create local backups
+- Account management and basic file operations
 
-This monorepo contains all our source code - the client apps (iOS / Android /
-F-Droid / Web / Linux / macOS / Windows) for both the products (and more planned
-future ones!), and the server that powers them.
+### Extended Features (This Fork)
 
-Our source code and cryptography have been externally audited by Cure53 (a
-German cybersecurity firm, arguably the world's best), Symbolic Software (French
-cryptography experts) and Fallible (an Indian penetration testing firm).
+This fork adds:
+- **Upload**: Upload images to Ente Photos with end-to-end encryption
+- **Watch**: Automatically upload new images from monitored folders
+- Support for albums, deduplication, and smart duplicate detection
 
-Learn more at [ente.io](https://ente.io).
+## Features
 
-<br />
+### Export (Original Feature)
+- Download all your photos and videos from Ente Photos
+- Create local backups with original quality
+- Supports incremental exports
 
-## Ente Photos
+### Upload (Extended Feature)
+- Upload single or multiple images with end-to-end encryption
+- Batch upload with configurable concurrency
+- Smart deduplication (skip already-uploaded files)
+- Album organization and management
+- Progress tracking for large uploads
 
-![Screenshots of Ente Photos](.github/assets/photos.png)
+### Watch (Extended Feature)
+- Monitor folders for new images and auto-upload
+- Three modes:
+  - **Default**: Upload all to "CLI Uploads" album
+  - **Specified Album** (`--album`): Upload all to user-specified album
+  - **Folder-as-Album** (`--folder-albums`): Each subfolder becomes a separate album
+- Duplicate detection with automatic album assignment
+- Graceful shutdown and state recovery
 
-Our flagship product. 3x data replication. Face detection. Semantic search.
-Private sharing. Collaborative albums. Family plans. Easy import, easier export.
-Background uploads. The list goes on. And of course, all of this, while being
-fully end-to-end encrypted across platforms.
+### Other Features
+- Account management (add, list, update)
+- Auth token decryption
+- Admin functions for self-hosted instances
 
-Ente Photos is a paid service, but we offer 10GB of free storage.
-You can also clone this repository and choose to self-host.
+### Security
+- End-to-end encryption using Ente's proven security model
+- All files encrypted client-side before upload
+- Per-file encryption keys, encrypted with collection keys
+- Server only sees encrypted blobs
+- Compatible with all official Ente clients (web, mobile, desktop)
 
-<br />
+## Installation
 
-<div align="center">
+### Download Pre-Built Binaries
 
-[<img height="40" src=".github/assets/app-store-badge.svg">](https://apps.apple.com/app/id1542026904)
-[<img height="40" src=".github/assets/play-store-badge.png">](https://play.google.com/store/apps/details?id=io.ente.photos)
-[<img height="40" src=".github/assets/f-droid-badge.png">](https://f-droid.org/packages/io.ente.photos.fdroid/)
-[<img height="40" src=".github/assets/obtainium-badge.png">](https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22io.ente.photos.independent%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2Fente-io%2Fente%22%2C%22author%22%3A%22ente-io%22%2C%22name%22%3A%22Ente%20Photos%22%2C%22preferredApkIndex%22%3A0%2C%22additionalSettings%22%3A%22%7B%5C%22includePrereleases%5C%22%3Afalse%2C%5C%22fallbackToOlderReleases%5C%22%3Atrue%2C%5C%22filterReleaseTitlesByRegEx%5C%22%3A%5C%22%5C%22%2C%5C%22filterReleaseNotesByRegEx%5C%22%3A%5C%22%5C%22%2C%5C%22verifyLatestTag%5C%22%3Afalse%2C%5C%22dontSortReleasesList%5C%22%3Atrue%2C%5C%22useLatestAssetDateAsReleaseDate%5C%22%3Afalse%2C%5C%22releaseTitleAsVersion%5C%22%3Afalse%2C%5C%22trackOnly%5C%22%3Afalse%2C%5C%22versionExtractionRegEx%5C%22%3A%5C%22%5C%22%2C%5C%22matchGroupToUse%5C%22%3A%5C%22%5C%22%2C%5C%22versionDetection%5C%22%3Atrue%2C%5C%22releaseDateAsVersion%5C%22%3Afalse%2C%5C%22useVersionCodeAsOSVersion%5C%22%3Afalse%2C%5C%22apkFilterRegEx%5C%22%3A%5C%22ente-photos*%5C%22%2C%5C%22invertAPKFilter%5C%22%3Afalse%2C%5C%22autoApkFilterByArch%5C%22%3Atrue%2C%5C%22appName%5C%22%3A%5C%22%5C%22%2C%5C%22shizukuPretendToBeGooglePlay%5C%22%3Afalse%2C%5C%22allowInsecure%5C%22%3Afalse%2C%5C%22exemptFromBackgroundUpdates%5C%22%3Afalse%2C%5C%22skipUpdateNotifications%5C%22%3Afalse%2C%5C%22about%5C%22%3A%5C%22%5C%22%7D%22%2C%22overrideSource%22%3Anull%7D)
-[<img height="40" src=".github/assets/desktop-badge.png">](https://ente.io/download/desktop)
-[<img height="40" src=".github/assets/web-badge.svg">](https://web.ente.io)
+The easiest way is to download a pre-built binary from the [GitHub releases](https://github.com/ente-io/ente/releases?q=tag%3Acli-v0).
 
-</div>
+### Prerequisites for Building from Source
+- Go 1.20 or higher
+- FFmpeg (for thumbnail generation)
 
-<br />
+### Build Release Binaries
 
-## Ente Auth
+```bash
+cd cli
+./release.sh
+```
 
-![Screenshots of Ente Photos](.github/assets/auth.png)
+### Build from Source
 
-Our labour of love. Two years ago, while building Ente Photos, we realized that
-there was no open source end-to-end encrypted authenticator app. We already had
-the building blocks, so we built one.
+```bash
+cd cli
+go build -o bin/ente main.go
+```
 
-Ente Auth is free, and will remain free forever. If you like the service and
-want to give back, please check out Ente Photos or spread the word.
+The generated binaries are standalone, static binaries with no dependencies. You can run them directly, or put them somewhere in your PATH.
 
-<br />
+There is also an option to use [Docker](#docker).
 
-<div align="center">
+## Usage
 
-[<img height="40" src=".github/assets/app-store-badge.svg">](https://apps.apple.com/app/id6444121398)
-[<img height="40" src=".github/assets/play-store-badge.png">](https://play.google.com/store/apps/details?id=io.ente.auth)
-[<img height="40" src=".github/assets/f-droid-badge.png">](https://f-droid.org/packages/io.ente.auth/)
-[<img height="40" src=".github/assets/obtainium-badge.png">](https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22io.ente.auth.independent%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2Fente-io%2Fente%22%2C%22author%22%3A%22ente-io%22%2C%22name%22%3A%22Ente%20Auth%22%2C%22preferredApkIndex%22%3A0%2C%22additionalSettings%22%3A%22%7B%5C%22includePrereleases%5C%22%3Afalse%2C%5C%22fallbackToOlderReleases%5C%22%3Atrue%2C%5C%22filterReleaseTitlesByRegEx%5C%22%3A%5C%22%5C%22%2C%5C%22filterReleaseNotesByRegEx%5C%22%3A%5C%22%5C%22%2C%5C%22verifyLatestTag%5C%22%3Afalse%2C%5C%22dontSortReleasesList%5C%22%3Atrue%2C%5C%22useLatestAssetDateAsReleaseDate%5C%22%3Afalse%2C%5C%22releaseTitleAsVersion%5C%22%3Afalse%2C%5C%22trackOnly%5C%22%3Afalse%2C%5C%22versionExtractionRegEx%5C%22%3A%5C%22%5C%22%2C%5C%22matchGroupToUse%5C%22%3A%5C%22%5C%22%2C%5C%22versionDetection%5C%22%3Atrue%2C%5C%22releaseDateAsVersion%5C%22%3Afalse%2C%5C%22useVersionCodeAsOSVersion%5C%22%3Afalse%2C%5C%22apkFilterRegEx%5C%22%3A%5C%22ente-auth*%5C%22%2C%5C%22invertAPKFilter%5C%22%3Afalse%2C%5C%22autoApkFilterByArch%5C%22%3Atrue%2C%5C%22appName%5C%22%3A%5C%22%5C%22%2C%5C%22shizukuPretendToBeGooglePlay%5C%22%3Afalse%2C%5C%22allowInsecure%5C%22%3Afalse%2C%5C%22exemptFromBackgroundUpdates%5C%22%3Afalse%2C%5C%22skipUpdateNotifications%5C%22%3Afalse%2C%5C%22about%5C%22%3A%5C%22%5C%22%7D%22%2C%22overrideSource%22%3Anull%7D)
-[<img height="40" src=".github/assets/desktop-badge.png">](https://github.com/ente-io/ente/releases?q=tag%3Aauth-v4)
-[<img height="40" src=".github/assets/web-badge.svg">](https://auth.ente.io)
+Run the help command to see all available commands:
 
-</div>
+```bash
+ente --help
+```
 
-<br />
+### Account Management
+
+If you wish, you can add multiple accounts (your own and that of your family members) and export all data using this tool.
+
+#### Add an account
+
+```bash
+ente account add
+```
+
+> [!NOTE]
+>
+> `ente account add` does not create new accounts, it just adds pre-existing accounts to the list of accounts that the CLI knows about so that you can use them for other actions.
+
+#### List accounts
+
+```bash
+ente account list
+```
+
+#### Change export directory
+
+```bash
+ente account update --app auth/photos --email email@domain.com --dir ~/photos
+```
+
+### Export (Backup)
+
+Export all photos and videos:
+
+```bash
+ente export
+```
+
+### Upload
+
+#### Upload a single image
+
+```bash
+ente upload photo.jpg
+```
+
+#### Upload to a specific album
+
+```bash
+ente upload photo.jpg --album "Vacation 2024"
+```
+
+#### Upload multiple files
+
+```bash
+ente upload *.jpg --album "Summer"
+```
+
+#### Upload recursively with custom concurrency
+
+```bash
+ente upload /path/to/photos -r --workers=8
+```
+
+### Watch Folders
+
+#### Watch a folder (default "CLI Uploads" album)
+
+```bash
+ente watch ~/Photos
+```
+
+#### Watch and upload to a specific album
+
+```bash
+ente watch ~/Photos --album "Family Photos"
+```
+
+#### Watch with folder-as-album mode
+
+Each subfolder becomes a separate album:
+
+```bash
+ente watch ~/Photos --folder-albums
+```
+
+Stop watching by pressing `Ctrl+C` for graceful shutdown with state preservation.
+
+### CLI Documentation
+
+You can view more CLI documentation at [cli/docs/generated/ente.md](cli/docs/generated/ente.md).
+
+To update the docs, run:
+
+```bash
+cd cli
+go run main.go docs
+```
+
+## Docker
+
+If you fancy Docker, you can also run the CLI within a container.
+
+### Configure
+
+Modify the `docker-compose.yml` and add volume. `cli-data` volume is mandatory, you can add more volumes for your export directory.
+
+Build and run the container in detached mode:
+
+```bash
+docker-compose up -d --build
+```
+
+Note that [BuildKit](https://docs.docker.com/go/buildkit/) is needed to build this image. If you face this issue, a quick fix is to add `DOCKER_BUILDKIT=1` in front of the build command.
+
+Execute commands in the container:
+
+```bash
+docker-compose exec ente-cli /bin/sh -c "./ente-cli version"
+docker-compose exec ente-cli /bin/sh -c "./ente-cli account add"
+docker-compose exec ente-cli /bin/sh -c "./ente-cli upload photo.jpg"
+docker-compose exec ente-cli /bin/sh -c "./ente-cli watch /path/to/photos"
+```
+
+## Self-Hosting
+
+For self-hosting configuration, see [cli/docs/selfhost.md](cli/docs/selfhost.md).
+
+## Architecture
+
+This repository includes the `architecture/` directory from the upstream Ente project, which contains detailed documentation on:
+- End-to-end encryption model
+- Key derivation and management
+- Cryptographic primitives (libsodium, ChaCha20-Poly1305)
+- Security audits and specifications
+
+See `architecture/README.md` for complete details.
+
+### Upload Pipeline
+
+1. File discovery and hash computation
+2. Deduplication check (local + remote)
+3. Metadata extraction (EXIF)
+4. Thumbnail generation (FFmpeg)
+5. Client-side encryption (file, thumbnail, metadata)
+6. S3 upload to presigned URLs
+7. Finalization via Museum API
+
+### Duplicate Handling
+
+If a file is already uploaded:
+- File is NOT re-uploaded (saves bandwidth and time)
+- File is added to the target album (re-encrypts file key with collection key)
+- Uses content hash for reliable deduplication
+
+## Upstream Project
+
+For the full Ente ecosystem including web, mobile, desktop apps, and the Museum API server, see:
+- **Main repository**: https://github.com/ente-io/ente
+- **Website**: https://ente.io
+- **Documentation**: https://ente.io/help
+
+## Development
+
+### Running Tests
+
+```bash
+cd cli
+go test ./...
+```
+
+Test specific packages:
+```bash
+go test ./pkg/uploader/...
+go test ./pkg/watcher/...
+```
+
+### Code Quality
+
+```bash
+cd cli
+go fmt ./...
+go vet ./...
+```
+
+### Regenerate Documentation
+
+```bash
+cd cli
+go run main.go docs
+```
 
 ## Contributing
 
-Want to get aboard the Ente hype train? Welcome along! Don't hesitate if you're
-not a developer, there are many other important ways in which [you can
-contribute](CONTRIBUTING.md).
+Contributions are welcome! When submitting pull requests:
+- Keep commit messages concise (under 72 chars)
+- Test your changes thoroughly
+- Ensure `go fmt` and `go vet` pass
+- Update documentation if adding new features
 
-## Support
+## License
 
-We are never more than an email away. For the various ways to ask for help,
-please see our [support guide](SUPPORT.md).
-
-## Community
-
-<img src=".github/assets/ente-ducky.png" width=200 alt="Ente's Mascot, Ducky,
-    inviting people to Ente's source code repository" />
-
-Please visit the [community section](https://ente.io/about#community) for all the ways to
-connect with our community.
-
-[![Discord](https://img.shields.io/discord/948937918347608085?style=for-the-badge&logo=Discord&logoColor=white&label=Discord)](https://discord.gg/z2YVKkycX3)
-[![Ente's Blog RSS](https://img.shields.io/badge/blog-rss-F88900?style=for-the-badge&logo=rss&logoColor=white)](https://ente.io/blog/rss.xml)
-
-[![Twitter](.github/assets/twitter.svg)](https://twitter.com/enteio) &nbsp; [![Mastodon](.github/assets/mastodon.svg)](https://fosstodon.org/@ente)
-
----
+This project inherits the license from the upstream [ente-io/ente](https://github.com/ente-io/ente) repository. See the LICENSE file for details.
 
 ## Security
 
-If you believe you have found a security vulnerability, please responsibly
-disclose it by emailing security@ente.io or [using this
-link](https://github.com/ente-io/ente/security/advisories/new) instead of
-opening a public issue. We will investigate all legitimate reports. To know
-more, please see our [security policy](SECURITY.md).
+If you discover a security vulnerability, please report it responsibly by emailing security@ente.io or using [this link](https://github.com/ente-io/ente/security/advisories/new).
+
+## Support
+
+For questions about the upstream Ente platform, see:
+- [Support Guide](https://github.com/ente-io/ente/blob/main/SUPPORT.md)
+- [Community](https://ente.io/about#community)
+- [Discord](https://discord.gg/z2YVKkycX3)
+
+For issues specific to this fork's upload/watch functionality, please open an issue in this repository.
