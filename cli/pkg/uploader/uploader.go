@@ -365,8 +365,7 @@ func (u *Uploader) uploadFileMultipart(encryptedFilePath string, fileSize int64)
 	}
 
 	// Request multipart upload URLs
-	partCount := len(partMD5s)
-	urls, err := u.client.GetMultipartUploadURLs(u.ctx, partCount, fileSize, multipartPartSize, partMD5s)
+	urls, err := u.client.GetMultipartUploadURLs(u.ctx, fileSize, multipartPartSize, partMD5s)
 	if err != nil {
 		return "", fmt.Errorf("failed to get multipart upload URLs: %w", err)
 	}

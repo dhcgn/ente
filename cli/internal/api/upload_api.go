@@ -26,10 +26,9 @@ type GetUploadURLRequest struct {
 
 // GetMultipartUploadURLsRequest contains parameters for multipart upload
 type GetMultipartUploadURLsRequest struct {
-	Count    int      `json:"count"`    // Number of parts
-	FileSize int64    `json:"fileSize"` // Total file size
-	PartSize int64    `json:"partSize"` // Size of each part
-	PartMD5s []string `json:"partMD5s"` // MD5 for each part (base64-encoded)
+	ContentLength int64    `json:"contentLength"` // Total file size
+	PartLength    int64    `json:"partLength"`    // Size of each part
+	PartMD5s      []string `json:"partMd5s"`      // MD5 for each part (base64-encoded)
 }
 
 // FileCreateRequest represents the file creation payload
@@ -85,12 +84,11 @@ func (c *Client) GetUploadURL(ctx context.Context, contentLength int64, contentM
 }
 
 // GetMultipartUploadURLs requests multipart upload URLs for large files
-func (c *Client) GetMultipartUploadURLs(ctx context.Context, count int, fileSize, partSize int64, partMD5s []string) (*MultipartUploadURLs, error) {
+func (c *Client) GetMultipartUploadURLs(ctx context.Context, fileSize, partSize int64, partMD5s []string) (*MultipartUploadURLs, error) {
 	req := GetMultipartUploadURLsRequest{
-		Count:    count,
-		FileSize: fileSize,
-		PartSize: partSize,
-		PartMD5s: partMD5s,
+		ContentLength: fileSize,
+		PartLength:    partSize,
+		PartMD5s:      partMD5s,
 	}
 
 	var result MultipartUploadURLs
