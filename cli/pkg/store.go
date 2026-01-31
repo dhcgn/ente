@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/ente-io/cli/pkg/model"
 	"log"
@@ -116,4 +117,53 @@ func getAccountStore(ctx context.Context, tx *bolt.Tx, storeType model.PhotosSto
 		return nil, fmt.Errorf("store %s not found", storeType)
 	}
 	return store, nil
+}
+
+// GetUploadState retrieves the upload state for a file by its hash
+func (c *ClICtrl) GetUploadState(ctx context.Context, fileHash string) (*model.UploadState, error) {
+	value, err := c.GetValue(ctx, model.UploadStates, []byte(fileHash))
+	if err != nil {
+		return nil, err
+	}
+	if value == nil {
+		return nil, nil
+	}
+
+	var state model.UploadState
+	if err := json.Unmarshal(value, &state); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal upload state: %w", err)
+	}
+	return &state, nil
+}
+
+// SaveUploadState saves the upload state for a file
+func (c *ClICtrl) SaveUploadState(ctx context.Context, state *model.UploadState) error {
+	state.UpdatedAt = time.Now().UnixMicro()
+	value, err := json.Marshal(state)
+	if err != nil {
+		return fmt.Errorf("failed to marshal upload state: %w", err)
+	}
+	return c.PutValue(ctx, model.UploadStates, []byte(state.FileHash), value)
+}
+
+// GetFileIDByHash retrieves the file ID for a given hash (for deduplication)
+func (c *ClICtrl) GetFileIDByHash(ctx context.Context, fileHash string) (int64, error) {
+	value, err := c.GetValue(ctx, model.FileHashes, []byte(fileHash))
+	if err != nil {
+		return 0, err
+	}
+	if value == nil {
+		return 0, nil
+	}
+
+	fileID, err := strconv.ParseInt(string(value), 10, 64)
+	if err != nil {
+		return 0, fmt.Errorf("failed to parse file ID: %w", err)
+	}
+	return fileID, nil
+}
+
+// SaveFileHash saves the mapping from file hash to file ID
+func (c *ClICtrl) SaveFileHash(ctx context.Context, fileHash string, fileID int64) error {
+	return c.PutValue(ctx, model.FileHashes, []byte(fileHash), []byte(strconv.FormatInt(fileID, 10)))
 }

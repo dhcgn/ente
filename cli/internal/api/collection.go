@@ -23,6 +23,11 @@ func (c *Client) GetCollections(ctx context.Context, sinceTime int64) ([]Collect
 	return res.Collections, err
 }
 
+// GetAllCollections fetches all collections (sinceTime=0)
+func (c *Client) GetAllCollections(ctx context.Context) ([]Collection, error) {
+	return c.GetCollections(ctx, 0)
+}
+
 func (c *Client) GetFiles(ctx context.Context, collectionID, sinceTime int64) ([]File, bool, error) {
 	var res struct {
 		Files   []File `json:"diff"`
