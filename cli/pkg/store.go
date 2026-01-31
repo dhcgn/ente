@@ -147,23 +147,116 @@ func (c *ClICtrl) SaveUploadState(ctx context.Context, state *model.UploadState)
 }
 
 // GetFileIDByHash retrieves the file ID for a given hash (for deduplication)
+// Deprecated: Use GetFileHashMapping instead for watch feature compatibility
 func (c *ClICtrl) GetFileIDByHash(ctx context.Context, fileHash string) (int64, error) {
-	value, err := c.GetValue(ctx, model.FileHashes, []byte(fileHash))
+	mapping, err := c.GetFileHashMapping(ctx, fileHash)
 	if err != nil {
 		return 0, err
 	}
-	if value == nil {
+	if mapping == nil {
 		return 0, nil
 	}
+	return mapping.FileID, nil
+}
 
-	fileID, err := strconv.ParseInt(string(value), 10, 64)
+// GetFileHashMapping retrieves the full file hash mapping (fileID and collectionID)
+func (c *ClICtrl) GetFileHashMapping(ctx context.Context, fileHash string) (*model.FileHashMapping, error) {
+	value, err := c.GetValue(ctx, model.FileHashes, []byte(fileHash))
 	if err != nil {
-		return 0, fmt.Errorf("failed to parse file ID: %w", err)
+		return nil, err
 	}
-	return fileID, nil
+	if value == nil {
+		return nil, nil
+	}
+
+	var mapping model.FileHashMapping
+	if err := json.Unmarshal(value, &mapping); err != nil {
+		// Try legacy format (plain file ID as string)
+		fileID, parseErr := strconv.ParseInt(string(value), 10, 64)
+		if parseErr != nil {
+			return nil, fmt.Errorf("failed to parse file hash mapping: %w", err)
+		}
+		return &model.FileHashMapping{
+			FileID:       fileID,
+			CollectionID: 0, // Legacy entries don't have collection ID
+		}, nil
+	}
+	return &mapping, nil
 }
 
 // SaveFileHash saves the mapping from file hash to file ID
+// Deprecated: Use SaveFileHashMapping instead for watch feature compatibility
 func (c *ClICtrl) SaveFileHash(ctx context.Context, fileHash string, fileID int64) error {
-	return c.PutValue(ctx, model.FileHashes, []byte(fileHash), []byte(strconv.FormatInt(fileID, 10)))
+	return c.SaveFileHashMapping(ctx, fileHash, fileID, 0)
+}
+
+// SaveFileHashMapping saves the complete mapping from file hash to file ID and collection ID
+func (c *ClICtrl) SaveFileHashMapping(ctx context.Context, fileHash string, fileID int64, collectionID int64) error {
+	mapping := model.FileHashMapping{
+		FileID:       fileID,
+		CollectionID: collectionID,
+	}
+	value, err := json.Marshal(mapping)
+	if err != nil {
+		return fmt.Errorf("failed to marshal file hash mapping: %w", err)
+	}
+	return c.PutValue(ctx, model.FileHashes, []byte(fileHash), value)
+}
+
+// GetWatchState retrieves the watch state for a watch path
+func (c *ClICtrl) GetWatchState(ctx context.Context, watchPath string) (*model.WatchState, error) {
+	// Use hash of path as key to handle long paths
+	key := fmt.Sprintf("%x", watchPath)
+	value, err := c.GetValue(ctx, model.WatchStates, []byte(key))
+	if err != nil {
+		return nil, err
+	}
+	if value == nil {
+		return nil, nil
+	}
+
+	var state model.WatchState
+	if err := json.Unmarshal(value, &state); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal watch state: %w", err)
+	}
+	return &state, nil
+}
+
+// SaveWatchState saves the watch state for a watch path
+func (c *ClICtrl) SaveWatchState(ctx context.Context, state *model.WatchState) error {
+	value, err := json.Marshal(state)
+	if err != nil {
+		return fmt.Errorf("failed to marshal watch state: %w", err)
+	}
+	key := fmt.Sprintf("%x", state.WatchPath)
+	return c.PutValue(ctx, model.WatchStates, []byte(key), value)
+}
+
+// GetProcessedFile retrieves the processed file record by file path
+func (c *ClICtrl) GetProcessedFile(ctx context.Context, filePath string) (*model.ProcessedFile, error) {
+	// Use hash of path as key
+	key := fmt.Sprintf("%x", filePath)
+	value, err := c.GetValue(ctx, model.WatchFiles, []byte(key))
+	if err != nil {
+		return nil, err
+	}
+	if value == nil {
+		return nil, nil
+	}
+
+	var file model.ProcessedFile
+	if err := json.Unmarshal(value, &file); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal processed file: %w", err)
+	}
+	return &file, nil
+}
+
+// SaveProcessedFile saves the processed file record
+func (c *ClICtrl) SaveProcessedFile(ctx context.Context, file *model.ProcessedFile) error {
+	value, err := json.Marshal(file)
+	if err != nil {
+		return fmt.Errorf("failed to marshal processed file: %w", err)
+	}
+	key := fmt.Sprintf("%x", file.FilePath)
+	return c.PutValue(ctx, model.WatchFiles, []byte(key), value)
 }

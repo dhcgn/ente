@@ -118,7 +118,7 @@ func createDataBuckets(db *bolt.DB, account model.Account) error {
 		if err != nil {
 			return fmt.Errorf("create bucket: %s", err)
 		}
-		for _, subBucket := range []model.PhotosStore{model.KVConfig, model.RemoteAlbums, model.RemoteFiles, model.RemoteAlbumEntries} {
+		for _, subBucket := range []model.PhotosStore{model.KVConfig, model.RemoteAlbums, model.RemoteFiles, model.RemoteAlbumEntries, model.UploadStates, model.FileHashes, model.WatchStates, model.WatchFiles} {
 			_, err := dataBucket.CreateBucketIfNotExists([]byte(subBucket))
 			if err != nil {
 				return err

@@ -75,6 +75,56 @@ func (c *ClICtrl) Upload(files []string, albumName string, config model.UploadCo
 	return summary, nil
 }
 
+// InitializeWatchBuckets initializes all necessary buckets for the watch command
+// Returns the properly initialized context that should be used for all API calls
+func (c *ClICtrl) InitializeWatchBuckets(ctx context.Context) (context.Context, error) {
+	// Get account
+	accounts, err := c.GetAccounts(context.Background())
+	if err != nil {
+		return nil, fmt.Errorf("failed to get accounts: %w", err)
+	}
+
+	if len(accounts) == 0 {
+		return nil, fmt.Errorf("no accounts found. Add an account using 'ente account add'")
+	}
+
+	// Find first Photos account
+	var account model.Account
+	found := false
+	for _, acc := range accounts {
+		if acc.App == "photos" {
+			account = acc
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		return nil, fmt.Errorf("no Photos account found. Add an account using 'ente account add'")
+	}
+
+	// Load secrets
+	accSecretInfo, err := c.KeyHolder.LoadSecrets(account)
+	if err != nil {
+		return nil, fmt.Errorf("failed to load secrets: %w", err)
+	}
+
+	// Create context with account information
+	ctx = context.WithValue(ctx, "app", string(account.App))
+	ctx = context.WithValue(ctx, "account_key", account.AccountKey())
+	ctx = context.WithValue(ctx, "user_id", account.UserID)
+
+	// Set auth token for API client
+	c.Client.AddToken(account.AccountKey(), base64.URLEncoding.EncodeToString(accSecretInfo.Token))
+
+	// Create buckets
+	if err := c.createUploadBuckets(ctx); err != nil {
+		return nil, err
+	}
+
+	return ctx, nil
+}
+
 // createUploadBuckets ensures upload-related buckets exist in BoltDB
 func (c *ClICtrl) createUploadBuckets(ctx context.Context) error {
 	accountKey := ctx.Value("account_key").(string)
@@ -101,6 +151,16 @@ func (c *ClICtrl) createUploadBuckets(ctx context.Context) error {
 		// Create FileHashes bucket
 		if _, err := accountBucket.CreateBucketIfNotExists([]byte(model.FileHashes)); err != nil {
 			return fmt.Errorf("failed to create FileHashes bucket: %w", err)
+		}
+
+		// Create WatchStates bucket
+		if _, err := accountBucket.CreateBucketIfNotExists([]byte(model.WatchStates)); err != nil {
+			return fmt.Errorf("failed to create WatchStates bucket: %w", err)
+		}
+
+		// Create WatchFiles bucket
+		if _, err := accountBucket.CreateBucketIfNotExists([]byte(model.WatchFiles)); err != nil {
+			return fmt.Errorf("failed to create WatchFiles bucket: %w", err)
 		}
 
 		return nil

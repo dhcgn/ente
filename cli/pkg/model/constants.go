@@ -9,6 +9,8 @@ const (
 	RemoteAlbumEntries PhotosStore = "remoteAlbumEntries"
 	UploadStates       PhotosStore = "uploadStates"
 	FileHashes         PhotosStore = "fileHashes"
+	WatchStates        PhotosStore = "watchStates"
+	WatchFiles         PhotosStore = "watchFiles"
 )
 
 const (
