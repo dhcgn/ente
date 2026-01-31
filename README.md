@@ -1,3 +1,5 @@
+[![Go](https://github.com/dhcgn/ente-cli/actions/workflows/go.yml/badge.svg)](https://github.com/dhcgn/ente-cli/actions/workflows/go.yml)
+
 # Ente CLI
 
 Standalone command-line tool for Ente Photos with upload and folder watching capabilities.
