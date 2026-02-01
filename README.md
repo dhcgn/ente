@@ -1,5 +1,9 @@
 [![Go](https://github.com/dhcgn/ente-cli/actions/workflows/go.yml/badge.svg)](https://github.com/dhcgn/ente-cli/actions/workflows/go.yml) [![codecov](https://codecov.io/gh/dhcgn/ente-cli/graph/badge.svg?token=MTmMrjUWmm)](https://codecov.io/gh/dhcgn/ente-cli)
 
+# USE THIS AT YOUR OWN RISK. THIS IS A FORK AND NOT OFFICIALLY SUPPORTED BY ENTE.IO.
+
+You need to be crazy to use this fork in production. There is no support, no warranty, and no guarantee that it will work as expected. Use at your own risk. You could destroy your data and lose everything. You have been warned.
+
 # Ente CLI
 
 Standalone command-line tool for Ente Photos with upload and folder watching capabilities.
