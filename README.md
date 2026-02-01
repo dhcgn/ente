@@ -1,4 +1,4 @@
-[![Go](https://github.com/dhcgn/ente-cli/actions/workflows/go.yml/badge.svg)](https://github.com/dhcgn/ente-cli/actions/workflows/go.yml)
+[![Go](https://github.com/dhcgn/ente-cli/actions/workflows/go.yml/badge.svg)](https://github.com/dhcgn/ente-cli/actions/workflows/go.yml) [![codecov](https://codecov.io/gh/dhcgn/ente-cli/graph/badge.svg?token=MTmMrjUWmm)](https://codecov.io/gh/dhcgn/ente-cli)
 
 # Ente CLI
 
